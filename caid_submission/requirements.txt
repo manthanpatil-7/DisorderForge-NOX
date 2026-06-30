@@ -1,0 +1,6 @@
+# DisorderForge-NOX runtime dependencies (CPU only, offline at runtime).
+# Install the CPU build of torch:  pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.0,<3
+numpy>=1.23,<3
+h5py>=3.7
+PyYAML>=6.0

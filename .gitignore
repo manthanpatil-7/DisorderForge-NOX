@@ -1,0 +1,128 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# DisorderForge — repository .gitignore  (SUBMISSION-ONLY scope)
+#
+# Commit ONLY what the CAID submission needs: caid_submission/, src/, the 8
+# production checkpoints, and the root README. Everything else — the ~17 GB of
+# data AND all the research code (scripts/, notebooks, planning, manuscript) —
+# is excluded. Root-anchored patterns (leading /) so that e.g. `/scripts/` does
+# NOT also drop caid_submission/scripts/. Weights re-included via the allowlist
+# pattern (ignore `dir/*`, then `!dir/needed_file`).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Raw data, benchmarks, DisProt/CAID archives, MSAs, AF2 structures, 3Di ──
+# (benchmarks, msa/, msa_t.tar, saprot 3Di, alphafold/, disprot, splits — ~9.5 GB)
+data/
+
+# ── Extracted pLM embeddings / feature matrices ──
+features/
+
+# ── Large intermediate results / prediction matrices / experiment outputs ──
+#    (keep ONLY the 3 RM student checkpoints under results/part11/ckpt/)
+results/*
+!results/part11
+results/part11/*
+!results/part11/ckpt
+results/part11/ckpt/*
+!results/part11/ckpt/RM_seed42.pt
+!results/part11/ckpt/RM_seed123.pt
+!results/part11/ckpt/RM_seed456.pt
+
+# ── Model checkpoints: ignore all, re-include ONLY the 5 production heads ──
+checkpoints/*
+!checkpoints/EXP-S02-v3_seed42_best.pt
+!checkpoints/EXP-S02-v3_seed123_best.pt
+!checkpoints/EXP-S02-v3_seed456_best.pt
+!checkpoints/EXP-E13H_seed42_best.pt
+!checkpoints/EXP-E13H_seed123_best.pt
+
+# ── Separate (non-NOX) artifacts and large bundles ──
+# caid_pdb_best/ is the separate PDB-ensemble artifact, not the NOX submission
+caid_pdb_best/
+ensemble/
+mmseqs/
+
+# ── Third-party tool binaries (provide the command, not the binary) ──
+# Foldseek (40 MB) is a public tool used for SaProt 3Di; ship the command in
+# EMBEDDINGS.md, not the binary.
+tools/foldseek/bin/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# ── Research code & artifacts — NOT part of the submission ──
+#    (root-anchored: these only match at the repo root, never under caid_submission/)
+/scripts/
+/tests/
+/manual_checks/
+/manuscript/
+/planning*/
+/audits/
+/docs/
+/configs/
+/state/
+/tools/
+/archive/
+/CLAUDE.md
+/pyproject.toml
+/thresholds.yaml
+/*.ipynb
+
+# ── Logs / per-step experiment records ──
+experiment_logs/
+step_logs/
+*.log
+
+# ── Predictor runtime outputs ──
+output/
+**/output/
+*.caid
+timings.csv
+
+# ── Python caches / build / packaging ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Virtual environments ──
+.venv/
+venv/
+env/
+.conda/
+
+# ── Docker build artifacts ──
+*.tar.docker
+docker-build/
+
+# ── Jupyter ──
+.ipynb_checkpoints/
+
+# ── Secrets / credentials (never commit) ──
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+credentials.json
+*.secret
+*_secret*
+.netrc
+
+# ── IDE / OS ──
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

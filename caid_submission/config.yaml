@@ -1,0 +1,26 @@
+# DisorderForge-NOX — default configuration.
+# Every value can be overridden on the command line. No hard-coded absolute
+# paths: relative paths resolve against the repository root (the parent of this
+# caid_submission/ folder). CAID mounts embedding folders at runtime — set those
+# three paths here or pass them with --saprot-emb / --esm2-emb / --msat-emb.
+
+# --- model checkpoints (shipped with the repo) ---
+checkpoints_dir: null        # default: <repo>/checkpoints
+rm_ckpt_dir: null            # default: <repo>/results/part11/ckpt
+
+# --- precomputed embeddings (mounted by CAID; REQUIRED) ---
+saprot_emb: null             # dir of <id>.h5/.npy  SaProt 650M, 1280-d
+esm2_emb: null               # dir of <id>.h5/.npy  ESM-2 t33 650M, 1280-d
+msat_emb: null               # dir of <id>.h5/.npy  MSA-Transformer, 768-d
+
+# --- output ---
+out: ./output                # writes <out>/disorder/<id>.caid + <out>/timings.csv
+
+# --- inference ---
+# Binary-call threshold. CAID ranks on the continuous score (AP/AUC); this is the
+# binary column's operating point. Selected by MaxF1 on CAID2-NOX (independent of
+# the CAID3 test set) via scripts/pick_threshold.py — see GATE 8 in
+# CAID_SUBMISSION_READINESS.md. Re-run pick_threshold.py to regenerate.
+threshold: 0.200
+threads: null                # CPU threads; null = use all available
+

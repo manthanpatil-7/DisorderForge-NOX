@@ -1,0 +1,11 @@
+name: disorderforge-rm
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pytorch=2.*           # CPU build; from the pytorch channel
+  - cpuonly               # ensure no CUDA pulled in
+  - numpy>=1.23
+  - h5py>=3.7
+  - pyyaml>=6.0

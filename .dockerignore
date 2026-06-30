@@ -1,0 +1,29 @@
+# Keep the Docker build context tiny: the repo root holds many GB of data/
+# results/ tars that the CAID image does NOT need. Allowlist only what the
+# Dockerfile COPYs (caid_submission/, src/, the 8 checkpoints).
+*
+
+!caid_submission
+!src
+
+!checkpoints
+checkpoints/*
+!checkpoints/EXP-S02-v3_seed42_best.pt
+!checkpoints/EXP-S02-v3_seed123_best.pt
+!checkpoints/EXP-S02-v3_seed456_best.pt
+!checkpoints/EXP-E13H_seed42_best.pt
+!checkpoints/EXP-E13H_seed123_best.pt
+
+!results
+results/*
+!results/part11
+results/part11/*
+!results/part11/ckpt
+results/part11/ckpt/*
+!results/part11/ckpt/RM_seed42.pt
+!results/part11/ckpt/RM_seed123.pt
+!results/part11/ckpt/RM_seed456.pt
+
+# never ship these even if under an allowlisted dir
+**/__pycache__
+**/*.pyc
