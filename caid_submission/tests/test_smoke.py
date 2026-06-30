@@ -51,7 +51,7 @@ def test_fasta_ambiguous_chars():
 
 
 def test_lightweight_no_crash_on_ambiguous():
-    from src.features.sequence_features import all_lightweight
+    from disorderforge_caid.features import all_lightweight
     seq = "BZJUOXMKTAYIAKQR"
     lw = np.asarray(all_lightweight(seq), np.float32)
     assert lw.shape == (len(seq), 41), lw.shape

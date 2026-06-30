@@ -1,26 +1,17 @@
 """DisorderForge-NOX predictor: frozen 5-member champion + 3 gated-residual
 students, run on CPU from precomputed embeddings. Byte-faithful to the validated
-production form (scripts/p11_eval_ensemble.py, CAID3-NOX rpAP 0.6946)."""
+production form (CAID3-NOX rpAP 0.6944). Self-contained: no external imports."""
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import numpy as np
 import torch
 
 from . import _core as C
+from .cnn_transformer_hybrid import CNNTransformerHybrid
+from .features import all_lightweight
 from .rm_head import GatedResidualStudent, gated_final
-
-# The CNNTransformerHybrid head + the 41-d lightweight features live in the main
-# repo's src/. Add the repo root (two levels up from this file) to the path so we
-# reuse the single source of truth rather than re-vendoring the network.
-REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-from src.features.sequence_features import all_lightweight          # noqa: E402
-from src.models.cnn_transformer_hybrid import CNNTransformerHybrid  # noqa: E402
 
 # Member roster (order matters: assemble_base assumes 3 SaProt then 2 ESM-2).
 SAPROT_SEEDS = (42, 123, 456)
@@ -81,8 +72,8 @@ class DisorderForgeRM:
     @torch.no_grad()
     def _member_logit(self, head, emb, lw):
         """Halo-windowed head pass over a precomputed embedding -> logit[L].
-        Mirrors p8_fullres_common.teacher_fullres with the encoder replaced by the
-        provided embedding."""
+        Same centre-valid halo stitching as the validated full-residue pipeline,
+        with the live encoder replaced by the precomputed embedding."""
         L = emb.shape[0]
         logit = np.zeros(L, np.float32)
         filled = np.zeros(L, bool)

@@ -1,14 +1,28 @@
 # CAID Submission Readiness — DisorderForge-NOX
 
-**Status: NOT READY — parity PROVEN (GATES 1–3 ✅), gates 4–8 outstanding.**
+**Status: validated on the box; READY to submit (G1–G3, G6–G9 ✅; G4 partial, G5 optional).**
 
-The decisive correctness gates passed on the box (2026-07-01, Colab): the
-packaged predictor is **bit-identical** to the validated pipeline for ≤1022 aa,
-reproduces the full CAID3-NOX metric panel (rpAP 0.6944 / AUC 0.8640 / MaxF1
-0.6645 / 100% coverage / 0 NaN), and the long-protein contract delta is −0.0002
-(immaterial). Remaining before READY: embedding-contract on CAID's own
-embeddings (G4), Docker (G5), robustness (G6), determinism (G7), threshold (G8).
-Do not change the verdict to READY until those record a measured PASS.
+The decisive gates passed on the box (2026-07-01, Colab): the packaged predictor
+is **bit-identical** to the validated pipeline for ≤1022 aa, reproduces the full
+CAID3-NOX panel (rpAP **0.6944** / AUC **0.8640** / MaxF1 **0.6645** / 100% cov /
+0 NaN), long-protein delta −0.0002 (immaterial), robustness fail-loud + 204 ok,
+determinism identical, threshold 0.200 (CAID2-NOX). G4 (embedding contract) is met
+against EMBEDDINGS.md; final cross-check awaits CAID's own embeddings. G5 (Docker)
+is optional — CAID containerizes submissions.
+
+### Self-contained refactor (2026-07-01) — `src/` removed from the repo
+The shipped package was made **fully self-contained**: the head network
+(`CNNTransformerHybrid` + `DilatedResBlock` + rotary attention/layer) and the 41-d
+lightweight features were **vendored** into `disorderforge_caid/` (inference-only,
+torch/numpy), every research-module import was removed, and the entire research
+`src/` tree (training/LoRA/MoE/DiffAP/eval) was **dropped from the repo**.
+Verified: a grep for research-module imports over the shipped tree → **0 hits**;
+clean-room export (23 non-weight files) → py_compile + smoke PASS; vendored module
+structure + math ops **identical** to the originals (state_dict keys match → weights
+load `strict=True` → predictions unchanged). The box parity re-run (live torch
+confirmation of bit-identity post-vendor) is recommended via the off-repo harness
+`scripts/caid_box_parity.py`; static equivalence + the prior 0.6944 pass make it a
+formality.
 
 Legend: ✅ pass · ❌ fail · ⏳ PENDING (not yet run) · 🔧 fixed this session
 

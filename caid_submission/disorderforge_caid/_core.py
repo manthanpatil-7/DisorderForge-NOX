@@ -1,12 +1,6 @@
-"""Vendored pure numerics for the DisorderForge-NOX CAID predictor.
-
-These functions are byte-faithful copies of the validated training/eval code
-(scripts/p7_ft_common.py, p8_fullres_common.py, p9_label_common.py,
-scripts/p11_common.py). They are vendored here — rather than imported from the
-research scripts — so the container has NO dependency on the Google-Drive paths
-those modules autodetect at import time. Anything touched here must stay in sync
-with the source modules; the box parity test (reproduce CAID3-NOX rpAP 0.6946)
-is the guard.
+"""Pure numerics for the DisorderForge-NOX CAID predictor: halo windowing, base
+feature assembly, and the champion ensemble logit. Self-contained and byte-
+faithful to the validated production pipeline; the box parity test is the guard.
 
 Pure numpy: no torch, no filesystem, no network (so the windowing/feature logic
 is testable without a torch install). The torch RM head lives in rm_head.py.
@@ -15,13 +9,13 @@ from __future__ import annotations
 
 import numpy as np
 
-# ───────────────────────── windowing (p7_ft_common) ─────────────────────────
+# ───────────────────────── windowing ─────────────────────────
 WIN_MAX = 1022          # max biological residues per encoder/head window
 HALO = 128              # context residues each side whose predictions are discarded
 STRIDE = 766            # = VALID block width (valid blocks tile contiguously)
 WORKING_DIM = 256       # CNNTransformerHybrid penultimate width
 
-# ───────────────────────── feature dims (p9_label_common) ────────────────────
+# ───────────────────────── feature dims ────────────────────
 N_MEM = 5               # 3 SaProt-seed heads + 2 ESM-2-seed heads
 N_SAPROT = 3
 LW_DIM = 41             # all_lightweight Tier-1 dim
@@ -36,7 +30,7 @@ def halo_windows(L, offset=0):
     """Partition [0,L) into valid blocks (<=STRIDE) -> per-window
     (enc_s, enc_e, val_s, val_e). Each residue is OWNED by exactly one window
     (val block); enc block adds HALO context each side, clipped at termini.
-    Exact full coverage, no double counting. (Copy of p7_ft_common.halo_windows.)"""
+    Exact full coverage, no double counting."""
     if L <= WIN_MAX:
         return [(0, L, 0, L)]
     edges = [0]
@@ -63,7 +57,7 @@ def halo_windows(L, offset=0):
     return wins
 
 
-# ───────────────────────── base-feature assembly (p9_label_common) ──────────
+# ───────────────────────── base-feature assembly ──────────
 def _logit(p, eps=1e-6):
     p = np.clip(p, eps, 1 - eps)
     return np.log(p / (1 - p))
@@ -91,7 +85,7 @@ def local_summaries(score):
 
 def assemble_base(member_logits, lw):
     """member_logits [L,5], lw [L,41] -> [L, BASE_DIM(63)] float32.
-    (Copy of p9_label_common.assemble_features.)"""
+   """
     ens_logit = ensemble_logit_of(member_logits)[:, None]
     var = member_logits.var(1, keepdims=True)
     sap = member_logits[:, :N_SAPROT].mean(1, keepdims=True)

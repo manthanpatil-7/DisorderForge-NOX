@@ -1,10 +1,10 @@
 # Keep the Docker build context tiny: the repo root holds many GB of data/
 # results/ tars that the CAID image does NOT need. Allowlist only what the
-# Dockerfile COPYs (caid_submission/, src/, the 8 checkpoints).
+# Dockerfile COPYs (caid_submission/ + the 8 checkpoints). The package is
+# self-contained, so src/ is NOT needed in the image.
 *
 
 !caid_submission
-!src
 
 !checkpoints
 checkpoints/*

@@ -1,6 +1,6 @@
 # DisorderForge-NOX — CPU-only CAID 4 predictor.
-# Build from the REPOSITORY ROOT (so src/ and the checkpoints are in context):
-#   docker build -f caid_submission/Dockerfile -t disorderforge-rm .
+# Build from the REPOSITORY ROOT (so the checkpoints are in build context):
+#   docker build -f caid_submission/Dockerfile -t disorderforge-nox .
 # Run (mount the CAID-provided embeddings + an output dir):
 #   docker run --rm \
 #     -v /path/to/input.fasta:/data/input.fasta:ro \
@@ -21,9 +21,8 @@ RUN pip install --no-cache-dir \
 
 WORKDIR /app
 
-# Model code + the network definitions it reuses from the main repo.
+# Self-contained model code (vendored network + features; no external src/).
 COPY caid_submission/ /app/caid_submission/
-COPY src/ /app/src/
 
 # Trained weights (small: 5 heads ~13 MB + 3 RM students ~14 MB).
 COPY checkpoints/EXP-S02-v3_seed42_best.pt   /app/checkpoints/

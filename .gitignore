@@ -52,6 +52,9 @@ tools/foldseek/bin/
 
 # ── Research code & artifacts — NOT part of the submission ──
 #    (root-anchored: these only match at the repo root, never under caid_submission/)
+#    src/ is the research model tree; the predictor vendors what it needs into
+#    caid_submission/disorderforge_caid/, so src/ is no longer shipped.
+/src/
 /scripts/
 /tests/
 /manual_checks/

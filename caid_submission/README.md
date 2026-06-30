@@ -66,7 +66,7 @@ hard-coded absolute paths — checkpoint paths resolve against the repo root.
 ## Run (Docker)
 
 ```bash
-# build from the REPOSITORY ROOT (context needs src/ + checkpoints)
+# build from the REPOSITORY ROOT (context needs the checkpoints)
 docker build -f caid_submission/Dockerfile -t disorderforge-rm .
 
 docker run --rm \
@@ -100,22 +100,26 @@ docker run --rm \
 
 ```
 caid_submission/
-├── predict.py              # CLI entrypoint
-├── config.yaml             # default paths / threshold / threads
+├── predict.py                       # CLI entrypoint
+├── config.yaml                      # default paths / threshold / threads
 ├── disorderforge_caid/
-│   ├── model.py            # 5 heads + 3 RM students; full forward
-│   ├── _core.py            # vendored pure numerics (windowing, base feats, RM head)
-│   ├── embeddings.py       # .h5/.npy loader (id-keyed, length-aligned)
-│   └── io_caid.py          # FASTA in, .caid + timings.csv out
-├── scripts/compute_threshold.py   # (optional) re-derive binary threshold on val
-├── tests/test_smoke.py     # IO / windowing / ambiguous-char + end-to-end
+│   ├── model.py                     # 5 heads + 3 RM students; full forward
+│   ├── cnn_transformer_hybrid.py    # vendored head network (torch)
+│   ├── features.py                  # vendored 41-d lightweight features
+│   ├── rm_head.py                   # vendored RM gated-residual head (torch)
+│   ├── _core.py                     # vendored pure numerics (windowing, base feats)
+│   ├── embeddings.py                # .h5/.npy loader (id-keyed, length-checked)
+│   └── io_caid.py                   # FASTA in, .caid + timings.csv out
+├── scripts/compute_threshold.py     # (optional) re-derive binary threshold on val
+├── tests/test_smoke.py              # IO / windowing / ambiguous-char + end-to-end
 ├── Dockerfile · conda-env.yml · requirements.txt
 ├── README.md · EMBEDDINGS.md
 ```
 
-`model.py` reuses the network definition (`CNNTransformerHybrid`) and the 41-d
-lightweight features from the main repo's `src/`; everything else is vendored
-in `_core.py` so the container has no dependency on the research scripts' paths.
+The package is **fully self-contained**: the head network, the 41-d lightweight
+features, and all numerics are vendored into `disorderforge_caid/` (torch +
+numpy only). No external/research code is imported — nothing beyond this folder
+and the trained weights is needed to run the predictor.
 
 ## Notes
 

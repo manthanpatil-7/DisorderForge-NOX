@@ -11,8 +11,8 @@ whitespace token of the FASTA header. `L` = sequence length; row `i` = residue
 `i` (no BOS/EOS rows). The loader tolerates `.npy`/`.h5`, a transposed
 `[dim, L]`, and length mismatch (truncate/zero-pad).
 
-Reference extractor scripts in the main repo are cited per section; running
-those exact commands reproduces the training-time embeddings.
+Each section below gives the exact public model, layer, and preprocessing needed
+to reproduce the embeddings the trained heads expect.
 
 ---
 
@@ -32,9 +32,6 @@ an AlphaFold/ColabFold structure via Foldseek.
    (`SaProtForMaskedLM(...).esm` / `AutoModel`), take `last_hidden_state`, and
    **drop the BOS and EOS rows** → `[L, 1280]`.
 
-Repo extractor: `scripts/colab_p5_ph0_s03_saprot_extract.py`
-(`build_saprot_input` in `scripts/p7_ft_common.py` is the canonical interleave).
-
 ## 2. ESM-2 — `facebook/esm2_t33_650M_UR50D`, dim 1280
 
 Sequence-only. Tokenize the raw sequence, run the encoder, take the **final
@@ -52,10 +49,6 @@ Needs an MSA (a3m) for the query.
    tile in chunks of **≤ 1023 columns** (the `+1` is the BOS token). Take the
    **query row (row 0)** of the final-layer representation → `[L, 768]`.
 
-Repo extractor: `scripts/colab_p6_ph0_s02_msat_extract.py` (chunked 1023-col,
-query-row, keyed by UniProt accession). The `data/msa_t.tar` used in development
-follows exactly this format (`embedding`, `msa_depth`, `sequence`).
-
 ---
 
 ## Long sequences (L > 1022) — windowing
@@ -69,9 +62,9 @@ residues of context each side (clipped at termini).
   pipeline. (89 % of CAID3 NOX proteins.)
 - **L > 1022:** ESM-2/SaProt cannot ingest > ~1024 tokens at once, so the
   embedding **must** be produced by windowing. To match the heads exactly, embed
-  each `halo_windows(L)` window and write, for every residue, the value from the
-  window that **owns** it (its valid block). The repo extractor scripts above do
-  this. MSA-Transformer column-tiling already follows the same idea.
+  each 1022-wide window (128-residue halo each side, 766-residue stride) and
+  write, for every residue, the value from the window that **owns** it (its
+  766-wide valid block). MSA-Transformer column-tiling follows the same idea.
 
 If CAID's standard precompute emits a single full-length embedding via a
 different windowing scheme, results for the small > 1022 aa subset may differ by

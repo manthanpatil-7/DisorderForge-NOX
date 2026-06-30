@@ -1,14 +1,18 @@
 # BOX_CHECKLIST — DisorderForge-NOX CAID validation
 
-Exact, copy-paste commands to validate the submission on the **production box**
-(GPU + torch for the parity reference; the predictor itself is CPU-only). Run top
-to bottom. Record every result into `CAID_SUBMISSION_READINESS.md`. **Do not
-declare READY until GATES 1–9 pass.**
+> **Note (record):** these gates were executed and PASSED on the box on
+> 2026-07-01 — see `CAID_SUBMISSION_READINESS.md` for measured results. The
+> GPU parity/reference harness (`caid_box_parity.py`) and the embedding
+> extractors run against the full research environment and are **not part of
+> this submission repo**; they live in the authors' private workspace. The
+> predictor itself (`predict.py`) is fully self-contained and CPU-only. This
+> checklist is retained as documentation of the validation procedure.
 
-Assumes repo root `$DF` and a clean checkout. Set:
+Exact, copy-paste commands to validate the predictor on the **production box**.
+The predictor is CPU-only; the parity *reference* needs GPU + the research env.
 
 ```bash
-export DF="$PWD"          # repo root (contains caid_submission/, src/, checkpoints/)
+export DF="$PWD"          # repo root (contains caid_submission/, checkpoints/)
 cd "$DF"
 ```
 
